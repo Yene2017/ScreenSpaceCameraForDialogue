@@ -2,8 +2,12 @@ namespace vcf
 {
 	namespace tools
 	{
-		public struct degree : System.IComparable<degree>
-		{
+#pragma warning disable CS0660 // 类型定义运算符 == 或运算符 !=，但不重写 Object.Equals(object o)
+#pragma warning disable CS0661 // 类型定义运算符 == 或运算符 !=，但不重写 Object.GetHashCode()
+        public struct degree : System.IComparable<degree>
+#pragma warning restore CS0661 // 类型定义运算符 == 或运算符 !=，但不重写 Object.GetHashCode()
+#pragma warning restore CS0660 // 类型定义运算符 == 或运算符 !=，但不重写 Object.Equals(object o)
+        {
 			private float m_value;
 
 			public degree(float val)

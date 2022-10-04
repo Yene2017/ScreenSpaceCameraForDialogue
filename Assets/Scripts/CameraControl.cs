@@ -83,7 +83,7 @@ public class CameraControl : MonoBehaviour
     {
         debuger = new CameraControlDebuger();
         debuger.target = this;
-        SceneView.onSceneGUIDelegate += debuger.OnSceneGUI;
+        SceneView.duringSceneGui += debuger.OnSceneGUI;
         actor1.head = GameObject.FindGameObjectWithTag("Actor1").transform;
         actor1.collider = actor1.head.GetComponent<Collider>();
         actor2.head = GameObject.FindGameObjectWithTag("Actor2").transform;
@@ -137,7 +137,7 @@ public class CameraControl : MonoBehaviour
 
     private void OnDisable()
     {
-        SceneView.onSceneGUIDelegate -= debuger.OnSceneGUI;
+        SceneView.duringSceneGui -= debuger.OnSceneGUI;
         debuger.Dispose();
         debuger = null;
     }

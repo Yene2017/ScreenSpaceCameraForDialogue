@@ -64,8 +64,10 @@ namespace vcf
 	            }
 	        }
 
-	        public Matrix3 transposed()
-	        {
+#pragma warning disable CS0108 // 成员隐藏继承的成员；缺少关键字 new
+            public Matrix3 transposed()
+#pragma warning restore CS0108 // 成员隐藏继承的成员；缺少关键字 new
+            {
 	            Matrix3 m = new Matrix3(this);
 	            m.transpose();
 	            return m;

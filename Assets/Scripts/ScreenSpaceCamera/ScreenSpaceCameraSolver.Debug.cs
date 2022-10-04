@@ -1,9 +1,8 @@
 ﻿#if UNITY_EDITOR
-
 using UnityEditor;
 using UnityEngine;
 
-namespace Pangu.Tools
+namespace CameraSolver
 {
     public partial class ScreenSpaceCameraSolver
     {
@@ -21,48 +20,59 @@ namespace Pangu.Tools
         {
             if (!Valid()) { return; }
             drawMode = 1;
-            DrawTarget();
-            DrawResultPoint(_camera, wbPosition, Color.red, out var bvp);
-            DrawResultPoint(_camera, wfPosition, Color.green, out var fvp);
+            DrawLine(wfPosition, wbPosition);
+            DrawLine(_bp, _fp);
+            DrawTargetRect();
+            DrawResultPoint(_camera, wbPosition, _bp, Color.red, out var bvp);
+            DrawResultPoint(_camera, wfPosition, _fp, Color.green, out var fvp);
             DrawLine(bvp, fvp);
-            DebugInfo();
-        }
-
-        private void DrawResultPoint(Camera camera, Vector3 position, Color color, out Vector3 nearPos)
-        {
-            var vp = camera.WorldToViewportPoint(position);
-            var cp = camera.transform.position;
-            var depth = vp.z;
-            var interval = camera.nearClipPlane / depth;
-            SetColor(color);
-            #region NearPlane
-            nearPos = Vector3.Lerp(cp, position, interval);
-            var nearCenter = cp + camera.transform.forward * camera.nearClipPlane;
-            #endregion
-            #region PosPlane
-            var posCenter = cp + camera.transform.forward * depth;
-            var ppp = posCenter + Vector3.ProjectOnPlane(position - posCenter, camera.transform.up);
-            DrawLine(posCenter, cp);
-            DrawLine(posCenter, ppp);
-            DrawLine(position, ppp);
-            #endregion
             SetColor(Color.white);
             Handles.Label(_bp, "B");
             Handles.Label(_fp, "F");
             Handles.Label(wbPosition, "WB");
             Handles.Label(wfPosition, "WF");
             Handles.Label(_lookCenter, "L");
-            Handles.Label(cp, "C");
-            Handles.Label((ppp + posCenter) / 2, $"{Mathf.Abs(vp.x * 2 - 1):F2}");
-            Handles.Label((ppp + position) / 2, $"{(vp.y - 0.5f):F2}");
-            DrawLine(nearCenter, cp);
             DrawLine(wbPosition, wbPosition + _fp - _bp);
+            DebugInfo();
         }
 
-        private void DrawTarget()
+        private void DrawResultPoint(Camera camera, Vector3 worldPos, Vector3 projectPos, Color color, out Vector3 nearPos)
         {
-            DrawLine(wfPosition, wbPosition);
-            DrawLine(_bp, _fp);
+            var vp = camera.WorldToViewportPoint(worldPos);
+            var cp = camera.transform.position;
+            var depth = vp.z;
+            var interval = camera.nearClipPlane / depth;
+            SetColor(color);
+            #region NearPlane
+            nearPos = Vector3.Lerp(cp, worldPos, interval);
+            var nearCenter = cp + camera.transform.forward * camera.nearClipPlane;
+            #endregion
+            #region PosPlane
+            var centerOnDepth = cp + camera.transform.forward * depth;
+            var ppp = centerOnDepth + Vector3.ProjectOnPlane(worldPos - centerOnDepth, camera.transform.up);
+            DrawLine(centerOnDepth, cp);
+            DrawLine(centerOnDepth, ppp);
+            DrawLine(worldPos, ppp);
+            #endregion
+            #region vertical
+            var a = Vector3.ProjectOnPlane(centerOnDepth - _lookCenter, Vector3.up);
+            var b = Vector3.ProjectOnPlane(centerOnDepth - projectPos, Vector3.up);
+            DrawLine(_lookCenter, _lookCenter + a);
+            DrawLine(projectPos, projectPos + b);
+            DrawLine(centerOnDepth, _lookCenter + a);
+            DrawLine(centerOnDepth, projectPos + b);
+            var angleB = Mathf.Acos(Vector3.Dot(b.normalized, (centerOnDepth - projectPos).normalized)) * Mathf.Rad2Deg;
+            Handles.Label((projectPos + projectPos + b + centerOnDepth) / 3, $"{angleB:F1}°");
+            #endregion
+            SetColor(Color.white);
+            Handles.Label(cp, "C");
+            Handles.Label((ppp + centerOnDepth) / 2, $"{Mathf.Abs(vp.x * 2 - 1):F2}");
+            Handles.Label((ppp + worldPos) / 2, $"{(vp.y - 0.5f):F2}");
+            DrawLine(nearCenter, cp);
+        }
+
+        private void DrawTargetRect()
+        {
             var size = 80f;
             var sv = SceneView.currentDrawingSceneView;
             var camera = _camera;
@@ -74,11 +84,11 @@ namespace Pangu.Tools
             var fsp = camera.WorldToScreenPoint(wfPosition);
             var bsp = camera.WorldToScreenPoint(wbPosition);
             var bSize = size / bsp.z;
-            var fSize = bSize / (float)_overSacle;
+            var fSize = bSize / (float)_overScale;
             EditorGUI.DrawRect(new Rect(fsp.x - fSize, camera.pixelHeight - fsp.y - 2 * fSize,
-                fSize * 2, fSize * 2), Color.blue * 0.4f);
+                fSize * 2, fSize * 2), Color.blue * 0.2f);
             EditorGUI.DrawRect(new Rect(bsp.x - bSize, camera.pixelHeight - bsp.y - 2 * bSize,
-                bSize * 2, bSize * 2), Color.blue * 0.4f);
+                bSize * 2, bSize * 2), Color.blue * 0.2f);
             Handles.EndGUI();
         }
 

@@ -2,8 +2,12 @@ namespace vcf
 {
 	namespace tools
 	{
-		public class radian : System.IComparable<radian>
-		{
+#pragma warning disable CS0660 // 类型定义运算符 == 或运算符 !=，但不重写 Object.Equals(object o)
+#pragma warning disable CS0661 // 类型定义运算符 == 或运算符 !=，但不重写 Object.GetHashCode()
+        public class radian : System.IComparable<radian>
+#pragma warning restore CS0661 // 类型定义运算符 == 或运算符 !=，但不重写 Object.GetHashCode()
+#pragma warning restore CS0660 // 类型定义运算符 == 或运算符 !=，但不重写 Object.Equals(object o)
+        {
 			private float m_value;
 				
 			public radian(float val)
@@ -102,8 +106,12 @@ namespace vcf
 		    }
 		}
 
-		public class radian2 : System.IComparable<radian2>
-		{
+#pragma warning disable CS0660 // 类型定义运算符 == 或运算符 !=，但不重写 Object.Equals(object o)
+#pragma warning disable CS0661 // 类型定义运算符 == 或运算符 !=，但不重写 Object.GetHashCode()
+        public class radian2 : System.IComparable<radian2>
+#pragma warning restore CS0661 // 类型定义运算符 == 或运算符 !=，但不重写 Object.GetHashCode()
+#pragma warning restore CS0660 // 类型定义运算符 == 或运算符 !=，但不重写 Object.Equals(object o)
+        {
 		    private float m_value;
 
 		    public radian2(float val)

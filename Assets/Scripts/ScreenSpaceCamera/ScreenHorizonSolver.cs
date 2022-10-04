@@ -1,12 +1,10 @@
 ﻿using System;
-
-
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 using UnityEngine;
 
-namespace Pangu.Tools
+namespace CameraSolver
 {
     [System.Serializable, ExecuteInEditMode]
     public class ScreenHorizonSolver : MonoBehaviour

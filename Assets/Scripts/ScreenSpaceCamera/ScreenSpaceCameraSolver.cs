@@ -1,12 +1,10 @@
 ﻿using System;
-
-
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 using UnityEngine;
 
-namespace Pangu.Tools
+namespace CameraSolver
 {
     [System.Serializable, ExecuteInEditMode]
     public partial class ScreenSpaceCameraSolver : MonoBehaviour
@@ -22,19 +20,16 @@ namespace Pangu.Tools
         }
 
         [SerializeField] private Camera _camera;
-        [Space(20)]
         public ViewportTarget front;
-        [Space(20)]
         public ViewportTarget back;
         [Range(-90, 90)]
-        [Space(20)]
         public float yaw = -30;
         [Range(0.1f, 75)]
-        [Space(20)]
         public float fov = 30;
         [Range(-90, 90)]
-        [Space(20)]
         public float dutch = 0;
+        [Range(1, 40)]
+        public float itrpPerDutch = 10;
 
         public double bCompX => back.compositionX;
         public double bCompY => back.compositionY;
@@ -46,7 +41,7 @@ namespace Pangu.Tools
         private Transform _calcTarget => _camera.transform;
 
         private double _aspect;//屏幕长宽比
-        private double _overSacle;//wb所在相机深度和wf所在相机深度的投影面大小比
+        private double _overScale;//wb所在相机深度和wf所在相机深度的投影面大小比
         private Vector3 _lookCenter;
         private Vector3 _bp;//wb在相机水平面的投影点
         private Vector3 _fp;//wf在相机水平面的投影点
@@ -64,6 +59,7 @@ namespace Pangu.Tools
             if (!_calcTarget) return null;
             if (!Valid()) return null;
             CalculateCameraPos();
+            _camera.fieldOfView = fov;
             return _calcTarget;
         }
 
@@ -88,9 +84,9 @@ namespace Pangu.Tools
             var clPfl = _sinC / _tanHalfHorizonFov / fCompX + _cosC;
             var blPfb = clPfl / (clPfl + clPbl);
             var flPfb = clPbl / (clPfl + clPbl);
-            _overSacle = (flPfb / fCompX) / (blPfb / bCompX);
+            _overScale = (flPfb / fCompX) / (blPfb / bCompX);
             var x = _sinC / fCompX * 2 / _aspect;
-            var clPdh2 = clPfl * clPfl / (abs(fCompY - bCompY * _overSacle) * x * x);
+            var clPdh2 = clPfl * clPfl / (abs(fCompY - bCompY * _overScale) * x * x);
             var clPfb = clPbl * clPfl / (clPfl + clPbl);
             var clPfb2 = clPfb * clPfb;
             var clPwfwb2 = clPfb2 * clPdh2 / (clPfb2 + clPdh2);
@@ -105,18 +101,28 @@ namespace Pangu.Tools
             #endregion
 
             #region Itr
-            var upAxis = _camera.transform.up;
-            _bp = wbPosition - upAxis * (float)(bY);
-            _fp = wfPosition - upAxis * (float)(fY);
-            _lookCenter = _bp * (float)flPfb + _fp * (float)blPfb;
-            var cameraFwd = Quaternion.AngleAxis(-yaw, upAxis) * (_bp - _fp).normalized;
-            #endregion
+            var i = 0;
+            do
+            {
+                i++;
+                var upAxis = _camera.transform.up;
+                _bp = wbPosition - upAxis * (float)(bY);
+                _fp = wfPosition - upAxis * (float)(fY);
+                _lookCenter = _bp * (float)flPfb + _fp * (float)blPfb;
+                var cameraFwd = Quaternion.AngleAxis(-yaw, upAxis) * (_bp - _fp).normalized;
+                _calcTarget.transform.position = _lookCenter -
+                    (float)(cl) * cameraFwd;
+                _calcTarget.transform.LookAt(_lookCenter, Quaternion.Euler(0, 0, dutch) * Vector3.up);
+            }
+            while (i < dutch / itrpPerDutch);
 
-            #region Apply
-            _calcTarget.transform.position = _lookCenter -
-                (float)(cl) * cameraFwd;
-            _calcTarget.transform.LookAt(_lookCenter, Quaternion.Euler(0, 0, dutch) * Vector3.up);
-            _camera.fieldOfView = fov;
+            //var right = Quaternion.AngleAxis(90 + yaw, upAxis) * (wbPosition - wfPosition) + upAxis * (float)(fY - bY);
+            //fwd = Quaternion.AngleAxis(-yaw, upAxis) * (wbPosition - upAxis * bY) - (wfPosition - upAxis * fY)
+            //fwd = Quaternion.AngleAxis(-yaw, upAxis) * (wbPosition - wfPosition + upAxis * (fY - bY))
+            //right = Quaternion.AngleAxis(90 + yaw, upAxis) * (wbPosition - wfPosition + upAxis * (fY - bY))
+            //ca1 = projectDeltaLine = wbPosition - wfPosition
+            //ca2 = fY - bY
+            //right = Quaternion.AngleAxis(90 + yaw, upAxis) * ca1 + upAxis * ca2
             #endregion
         }
 
