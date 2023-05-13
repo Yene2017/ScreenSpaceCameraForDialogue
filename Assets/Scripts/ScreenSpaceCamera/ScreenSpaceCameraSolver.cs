@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace CameraSolver
 {
+
     [System.Serializable, ExecuteInEditMode]
     public partial class ScreenSpaceCameraSolver : MonoBehaviour
     {

@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -228,8 +228,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 14535616}
-  - component: {fileID: 14535615}
   - component: {fileID: 14535614}
+  - component: {fileID: 14535615}
   m_Layer: 0
   m_Name: ScreenHorizonCamera
   m_TagString: Untagged
@@ -255,9 +255,9 @@ MonoBehaviour:
   fCompositionX: 0.247
   yaw: -54.4
   fov: 53.2
-  aspect: 1.7771084
-  focus: 0.7494990761273496
-  cl: 2.1354108062409476
+  aspect: 1.7777778
+  focus: 0.7495678982215623
+  cl: 2.134216289039491
   _camera: {fileID: 14535615}
 --- !u!20 &14535615
 Camera:
@@ -310,7 +310,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 14535613}
   m_LocalRotation: {x: 0, y: 0.8894164, z: 0, w: -0.45709798}
-  m_LocalPosition: {x: 1.7363043, y: 1.7, z: 0.3487833}
+  m_LocalPosition: {x: 1.735333, y: 1.7, z: 0.3483336}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}

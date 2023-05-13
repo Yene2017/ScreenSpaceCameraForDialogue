@@ -12,7 +12,5 @@
 
 项目里Cinemachine相关代码来自于Unity官方[Unity-Technologies/com.unity.cinemachine: Smart camera tools for passionate creators (github.com)](https://github.com/Unity-Technologies/com.unity.cinemachine)
 
-项目里ToricSpaceCamera相关代码来自于[hehao98/VisibilityAwareToricCamera: An implementation of Toric Space camera control with automatic visibility avoidance (github.com)](https://github.com/hehao98/VisibilityAwareToricCamera)
-
 关于什么是基于屏幕空间参数计算相机，在[根据屏幕空间参数计算相机(zhihu.com)](https://zhuanlan.zhihu.com/p/372617646)里有做详细介绍。
 
